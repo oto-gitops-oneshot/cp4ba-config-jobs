@@ -10,6 +10,8 @@ spec:
       containers:
       - name: db2-config
         image: quay.io/langley_millard_ibm/configure-db2
+        command: ["./configure/configure_db2.sh"]
+        args: ["-a", "preconfigure"]
         imagePullPolicy: Always
       restartPolicy: OnFailure
   backoffLimit: 2
