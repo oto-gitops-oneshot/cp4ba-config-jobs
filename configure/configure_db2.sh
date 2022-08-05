@@ -1,4 +1,9 @@
 #!/bin/sh
+
+oc_token='cat /var/run/secrets/kubernetes.io/serviceaccount/token'
+oc_server='https://openshift.default.svc.cluster.local'
+oc login --token=${oc_token} 
+
 echo "configuring db2"
 set -e 
 

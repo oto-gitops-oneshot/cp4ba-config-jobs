@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: db2-configure-sa
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: db2-configure-role
+rules:
+- apiGroups: [""] 
+  resources: ["pods", "secrets", "pods/exec"]
+  verbs: ["get", "patch", "create"]
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: db2-configure-rb
+subjects:
+- kind: ServiceAccount
+  name: db2-configure-sa
+  namespace: db2
+roleRef:
+  kind: ClusterRole
+  name: db2-configure-role
+  apiGroup: ""

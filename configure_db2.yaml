@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db2-configuration
+  namespace: db2
+spec:
+  template:
+    spec:
+      serviceAccountName: db2-configure-sa
+      containers:
+      - name: db2-config
+        image: quay.io/langley_millard_ibm/configure-db2
+        imagePullPolicy: Always
+      restartPolicy: OnFailure
+  backoffLimit: 2
