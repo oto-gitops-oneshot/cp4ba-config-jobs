@@ -40,11 +40,11 @@ function update_secrets {
 }
 
 function seed_databases {
-    DB2_PROJECT="db2"
+    DB2_NAMESPACE="db2"
     DB2_COMMANDS=db2-cmd.sh
 
-    echo "setting project to $DB2_PROJECT" && echo
-    oc project $DB2_PROJECT
+    echo "setting project to $DB2_NAMESPACE" && echo
+    oc project $DB2_NAMESPACE
 
     echo "Identifying DB2 pod" && echo
     DB2_POD_NAME=$(oc get pod -l role=db -ojsonpath='{.items[0].metadata.name}')
@@ -90,5 +90,4 @@ while getopts ":a:" opt; do
       exit 1
       ;;
   esac
-done
-~          
+done   
