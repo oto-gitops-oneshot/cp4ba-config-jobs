@@ -2,8 +2,8 @@
 echo "started"
 TOKEN_PATH=/var/run/secrets/kubernetes.io/serviceaccount
 CACERT=${TOKEN_PATH}/ca.crt
-DB2_NAMESPACE=${1:-"db2"}
-CP4BA_NAMESPACE=${2:-"cp4ba"}
+DB2_NAMESPACE="db2"
+CP4BA_NAMESPACE="cp4ba"
 
 echo "configuring db2"
 set -e 
@@ -40,7 +40,6 @@ function update_secrets {
 }
 
 function seed_databases {
-    DB2_NAMESPACE="db2"
     DB2_COMMANDS=db2-cmd.sh
 
     echo "setting project to $DB2_NAMESPACE" && echo
