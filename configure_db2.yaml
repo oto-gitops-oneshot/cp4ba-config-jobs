@@ -11,6 +11,9 @@ spec:
       - name: db2-config
         image: quay.io/langley_millard_ibm/configure-db2
         command: ["./configure/configure_db2.sh"]
+        env:
+        - name: KUBECONFIG
+          value: "/tmp/config"
         args: ["-a", "preconfigure"]
         imagePullPolicy: Always
       restartPolicy: OnFailure
