@@ -49,7 +49,10 @@ function delete_dbs {
 
 
 function main {
-+
+    echo "starting DB2 setup for Filenet object stores" && date
+    create_dbs
+    setup_osdb "OS1DB"
+    setup_osdb "OS2DB"
 }
 
 main > /tmp/filenet-db2-setup.log
