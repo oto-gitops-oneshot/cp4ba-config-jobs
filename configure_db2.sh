@@ -40,7 +40,6 @@ function update_secrets {
 }
 
 function seed_databases {
-    sleep 5000
     DB2_COMMANDS=db2-cmd.sh
 
     echo "setting project to $DB2_NAMESPACE" && echo
