@@ -40,6 +40,7 @@ function update_secrets {
 }
 
 function seed_databases {
+    sleep 5000
     DB2_COMMANDS=db2-cmd.sh
 
     echo "setting project to $DB2_NAMESPACE" && echo
@@ -71,8 +72,8 @@ while getopts ":a:" opt; do
           oc_token=$(cat ${TOKEN_PATH}/token)
           oc_server='https://kubernetes.default.svc'
           oc login $oc_server --token=${oc_token} --certificate-authority=${CACERT} --kubeconfig="/tmp/config"
-          echo "Updating secrets"
-          update_secrets
+        #   echo "Updating secrets"
+        #   update_secrets
           echo "Update secrets complete"
           seed_databases
           echo ""
