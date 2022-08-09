@@ -37,6 +37,16 @@ function setup_osdb {
     echo "setup for $dbname complete"
 }
 
+function clean_up {
+    if [[ $(db2 list database directory) =~ "BLUDB" ]]
+    then
+      db2 deactivate db BLUDB;
+      db2 force application ALL;
+      echo 'wait for force aplication to finish';
+      sleep 60;
+      db2 drop db BLUDB;
+    fi
+}
 
 function delete_dbs {
      echo "Dropping all FileNet db2 dbs"
@@ -53,6 +63,7 @@ function main {
     create_dbs
     setup_osdb "OS1DB"
     setup_osdb "OS2DB"
+    clean_up
 }
 
 main > /tmp/filenet-db2-setup.log
