@@ -56,7 +56,7 @@ function seed_databases {
     oc exec $DB2_POD_NAME -c db2u -- su - db2inst1 -c "db2 list database directory"
 
     echo "Starting database creation on pod $DB2_POD_NAME" && echo
-    oc cp $DB2_COMMANDS $DB2_POD_NAME:/tmp/$DB2_COMMANDS -c db2u
+    oc cp $DB2_COMMANDS $DB2_POD_NAME:$DB2_COMMANDS -c db2u
     oc exec $DB2_POD_NAME -it -c db2u -- chmod +rwx $DB2_COMMANDS
     oc exec $DB2_POD_NAME -it -c db2u -- su - db2inst1 -c "nohup $DB2_COMMANDS &"
 
