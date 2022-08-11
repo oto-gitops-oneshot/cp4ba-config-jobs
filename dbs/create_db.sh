@@ -43,8 +43,8 @@ function update_secrets {
 }
 
 function seed_databases {
-    cat $execstr > commands
-    DB2_COMMANDS="commands"
+    cat $execstr > /tmp/commands
+    DB2_COMMANDS="/tmp/commands"
     
     echo "setting project to $DB2_NAMESPACE" && echo
     oc project $DB2_NAMESPACE
@@ -57,8 +57,8 @@ function seed_databases {
 
     echo "Starting database creation on pod $DB2_POD_NAME" && echo
     oc cp $DB2_COMMANDS $DB2_POD_NAME:/tmp/$DB2_COMMANDS -c db2u
-    #oc exec $DB2_POD_NAME -it -c db2u -- eval(/tmp/$DB_COMMANDS)
-    oc exec $DB2_POD_NAME -it -c db2u -- su - db2inst1 -c "eval(/tmp/$DB2_COMMANDS) &"
+    oc exec $DB2_POD_NAME -it -c db2u -- chmod +rwx /tmp/$DB2_COMMANDS
+    oc exec $DB2_POD_NAME -it -c db2u -- su - db2inst1 -c "nohup /tmp/$DB2_COMMANDS &"
 
     echo "Database setup in progress" && echo
     echo "To list the databases, run:"
