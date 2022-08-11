@@ -43,7 +43,7 @@ function update_secrets {
 }
 
 function seed_databases {
-    cat $execstr > /tmp/commands
+    echo $execstr > /tmp/commands
     DB2_COMMANDS="/tmp/commands"
     
     echo "setting project to $DB2_NAMESPACE" && echo
