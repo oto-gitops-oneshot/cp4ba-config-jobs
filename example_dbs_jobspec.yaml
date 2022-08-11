@@ -9,12 +9,12 @@ spec:
       serviceAccountName: db2-configure-sa
       containers:
       - name: db-config
-        image: image here # location the image is pushed to i.e. quay.io/langley_millard_ibm/repo_name
-        command: ["./configure_db2.sh"]
+        image: quay.io/mikhail_nikitin1/db2init # location the image is pushed to i.e. quay.io/langley_millard_ibm/repo_name
+        command: ["./create_db.sh"]
         env:
         - name: KUBECONFIG
           value: "/tmp/config"
-        args: ["-a", "ban", "ier", "fcnm"]
+        args: ["-i", "BAN,FNCM,IER"]
         imagePullPolicy: Always
       restartPolicy: OnFailure
   backoffLimit: 2
