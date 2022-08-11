@@ -9,7 +9,7 @@ spec:
       serviceAccountName: db2-configure-sa
       containers:
       - name: db-config
-        image: quay.io/mikhail_nikitin1/db2init # location the image is pushed to i.e. quay.io/langley_millard_ibm/repo_name
+        image: quay.io/mikhail_nikitin1/db2init:latest # location the image is pushed to i.e. quay.io/langley_millard_ibm/repo_name
         command: ["./create_db.sh"]
         env:
         - name: KUBECONFIG
