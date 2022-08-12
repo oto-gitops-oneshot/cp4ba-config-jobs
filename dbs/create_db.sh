@@ -73,19 +73,17 @@ function create_users {
   if [ -z "$USER_LIST" ]
   then 
     echo "user list empty" 
-  
+    # we can leave it up to people to provide no user list if they have precreated users. If we want to ensure a user list is provided we can exit 1
   else 
     # - this secret has been created manually at the moment but we will external secrets this separately
-    UNIVERSAL_PASSWORD=$(oc get secret dbs-universal-password -n $DB2_NAMESPACE -o jsonpath='{.data.UNIVERSAL_PASSWORD}' | base64 --decode) 
+    UNIVERSAL_PASSWORD=$(oc get secret dbs-universal-password -n $CP4BA_NAMESPACE -o jsonpath='{.data.UNIVERSAL_PASSWORD}' | base64 --decode) 
     DB2_LDAP_POD_NAME=$(oc get pod -l role=ldap -ojsonpath='{.items[0].metadata.name}')
 
     # We can pass in a list of separated users as an env variable. 
     echo $USER_LIST
     for user in ${USER_LIST//,/ }
-    do
-      echo $user
-      echo $DB2_LDAP_POD_NAME
-      echo $UNIVERSAL_PASSWORD
+    do 
+      echo " creating $user in $DB2_LDAP_POD_NAME" 
       USER=$(oc exec $DB2_LDAP_POD_NAME -it -c ldap -- /opt/ibm/ldap_scripts/addLdapUser.py -u $user -p $UNIVERSAL_PASSWORD -r user)
     done
   fi
