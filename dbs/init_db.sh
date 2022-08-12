@@ -1,7 +1,33 @@
 #!/bin/bash
 
 # define the list of supported databases here
-supported_databases='IER FNCM BAN'
+supported_databases='CP4BA IER FNCM BAN'
+
+# setting +e so as the job doesnt fail and hold up future sync waves
+set +e
+
+function init_CP4BA_db {
+    # initialise BAN DB
+    cpba_init_cmd="
+    echo Initialising CP4BA DB;\n
+    {
+        db2 create database CP4BA automatic storage yes using codeset UTF-8 territory US pagesize 32768;
+        db2 UPDATE DB CFG FOR CP4BA USING LOGFILSIZ 16384 DEFERRED;
+        db2 UPDATE DB CFG FOR CP4BA USING LOGPRIMARY 64 IMMEDIATE;
+        db2 UPDATE DB CFG FOR CP4BA USING LOGSECOND 64 IMMEDIATE;
+        db2 activate db CP4BA;
+        db2 CONNECT TO CP4BA;
+        db2 CREATE BUFFERPOOL CP4BA_BP_32K IMMEDIATE SIZE AUTOMATIC PAGESIZE 32K;
+        db2 DROP TABLESPACE USERSPACE1;
+
+    } || {
+        echo There was an error reported; \n
+    }\n"
+    
+    printf "$cpba_init_cmd"
+
+}
+
 
 
 function init_BAN_db {

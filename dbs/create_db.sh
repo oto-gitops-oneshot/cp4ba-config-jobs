@@ -9,7 +9,9 @@ DB2_NAMESPACE="db2"
 CP4BA_NAMESPACE="cp4ba"
 
 echo "configuring db2"
-set -e 
+
+# set +e so the job executes without failing and doesnt hold up future sync waves
+set +e 
 
 # fetches instancepassword secret and returns base64 encoded password
 function fetch_db2_password {
@@ -63,8 +65,33 @@ function seed_databases {
     echo "Database setup in progress" && echo
     echo "To list the databases, run:"
     echo "oc exec $DB2_POD_NAME -c db2u -- su - db2inst1 -c \"db2 list database directory\""
+
 }
 
+function create_users {
+    # users we need to configure initially: gcd, fpos, ros, icndb, os1, 
+  if [ -z "$USER_LIST" ]
+  then 
+    echo "user list empty" 
+  
+  else 
+    # - this secret has been created manually at the moment but we will external secrets this separately
+    UNIVERSAL_PASSWORD=$(oc get secret dbs-universal-password -n $DB2_NAMESPACE -o jsonpath='{.data.UNIVERSAL_PASSWORD}' | base64 --decode) 
+    DB2_LDAP_POD_NAME=$(oc get pod -l role=ldap -ojsonpath='{.items[0].metadata.name}')
+
+    # We can pass in a list of separated users as an env variable. 
+    echo $USER_LIST
+    for user in ${USER_LIST//,/ }
+    do
+      echo $user
+      echo $DB2_LDAP_POD_NAME
+      echo $UNIVERSAL_PASSWORD
+      USER=$(oc exec $DB2_LDAP_POD_NAME -it -c ldap -- /opt/ibm/ldap_scripts/addLdapUser.py -u $user -p $UNIVERSAL_PASSWORD -r user)
+    done
+  fi
+    # Could also follow a similar pattern to configuring db2 but use a different flag (i.e. -u), write all commands to a file or variable, exec once then execute. completely up to you. 
+}
+create_users
 while getopts ":i:" opt; do
   case $opt in
     i)
