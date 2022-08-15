@@ -12,3 +12,14 @@ rules:
       - get
       - watch
       - list
+  - apiGroups:
+      - ''
+    resources:
+      - secrets
+    verbs:
+      - get
+      - watch
+      - list
+      - patch
+      - create
+
