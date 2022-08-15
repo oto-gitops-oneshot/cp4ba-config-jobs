@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: get-cert-ingress
+  namespace: default
+rules:
+  - apiGroups:
+      - 'config.openshift.io/v1'
+    resources:
+      - ingresscontroller
+    verbs:
+      - get
+      - watch
+      - list
