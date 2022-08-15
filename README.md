@@ -1,5 +1,4 @@
-# Repository for configuring DB2 and DBS
-
+# Repository for configuring cp4ba with GitOps Jobs
 ## How to use this repository: 
 
 The repository has a directory for several different jobs
