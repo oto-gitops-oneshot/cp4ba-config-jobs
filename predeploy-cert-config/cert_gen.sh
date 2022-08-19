@@ -43,5 +43,16 @@ stringData:
   cert.crt: "$wildcard_cert"
   tls.crt:  "$wildcard_cert"
   ca.crt:   "$global_ca_cert"
-type: Opaque"  > external_tls_cert.yaml
-oc apply -f external_tls_cert.yaml
+type: Opaque"  > /tmp/external_tls_cert.yaml
+oc apply -f /tmp/external_tls_cert.yaml
+
+echo "kind: Secret
+apiVersion: v1
+metadata:
+  name: cp4ba-root-ca
+  namespace: cp4ba
+stringData:
+  tls.key: "$global_ca_key"
+  tls.crt: "$global_ca_cert"
+type: Opaque" > /tmp/cp4ba_root_ca.yaml
+oc apply -f /tmp/cp4ba_root_ca.yaml
