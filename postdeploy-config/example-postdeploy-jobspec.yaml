@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postdeploy-configuration
+  namespace: cp4ba
+spec:
+  template:
+    spec:
+      containers:
+      - name: postdeploy-configuration
+        image: quay.io/langley_millard_ibm/cp4ba-postdeploy-config # location the image is pushed to i.e. quay.io/langley_millard_ibm/repo_name
+        command: ["./postdeploy-config.sh"]
+        env:
+        - name: POSTDEPLOY_CONFIG_LIST
+          value: "ZEN,IER,IER-TM,TM"
+        - name: KUBECONFIG
+          value: "/tmp/config"
+        imagePullPolicy: Always
+      restartPolicy: OnFailure
+  backoffLimit: 2
+  # path to preconfigure job git repo https://github.com/oto-cp4ba-gitops/cp4ba-config-jobs
+  # branch is origin/feature/multi-db-init-mn

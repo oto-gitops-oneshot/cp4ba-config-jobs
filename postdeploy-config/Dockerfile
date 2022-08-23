@@ -1,7 +1,9 @@
 FROM registry.access.redhat.com/ubi9/ubi-minimal
 WORKDIR ~
 COPY postdeploy-config.sh postdeploy-config.sh
-RUN chmod a+x cert_gen.sh
+COPY services.sh services.sh
+RUN chmod a+x postdeploy-config.sh
+RUN chmod a+x services.sh
 RUN microdnf update && microdnf install -y tar gzip wget && \
     # wget https://mirror.openshift.com/pub/openshift-v3/clients/3.11.0-0.10.0/linux/oc.tar.gz && \
     wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux-4.11.0.tar.gz && \
