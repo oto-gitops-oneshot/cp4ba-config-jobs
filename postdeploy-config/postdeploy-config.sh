@@ -21,7 +21,6 @@ function postdeploy_config {
     echo "config list empty" 
    
   else 
-    echo $POSTDEPLOY_CONFIG_LIST
     for item in ${POSTDEPLOY_CONFIG_LIST//,/ }
     do 
         case $item in
