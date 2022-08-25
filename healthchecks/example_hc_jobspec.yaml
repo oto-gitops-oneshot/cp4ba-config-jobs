@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cp4ba-healthcheck-core
+  namespace: cp4ba
+spec:
+  template:
+    spec:
+      serviceAccountName: ibm-cp4a-operator
+      containers:
+      - name: core-healthcheck
+        image: quay.io/mikhail_nikitin1/cp4ba_health_check # image to pull
+        command: ["/bin/bash"]
+        env:
+        - name: KUBECONFIG
+          value: "/tmp/config"
+        args: ["core_check.sh"] # per-job setting - can be core, options or patterns check
+        imagePullPolicy: Always
+      restartPolicy: OnFailure
+  backoffLimit: 2
+  
