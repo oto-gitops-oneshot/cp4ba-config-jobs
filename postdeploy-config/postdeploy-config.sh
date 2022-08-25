@@ -1,5 +1,5 @@
 #!/bin/bash
-
+POSTDEPLOY_CONFIG_LIST="IER"
 # script will take a list of services as args or env variable (i.e. ZEN,IER,IER-TM) and perform the relevant jobs specified in apollo 
 # reference the trello for specific tasks relevant to this project
 source ./services.sh
@@ -40,7 +40,7 @@ function postdeploy_config {
                 configure_tm
                 ;;
             *)
-                echo "service not yet configured. Please modify bash script or check arguments"
+                echo "Service not yet configured. Please modify bash script or check arguments"
                 ;;
         esac
     done

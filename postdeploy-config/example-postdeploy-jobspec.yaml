@@ -6,6 +6,7 @@ metadata:
 spec:
   template:
     spec:
+      serviceAccountName: cp4ba-sa
       containers:
       - name: postdeploy-configuration
         image: quay.io/langley_millard_ibm/cp4ba-postdeploy-config # location the image is pushed to i.e. quay.io/langley_millard_ibm/repo_name

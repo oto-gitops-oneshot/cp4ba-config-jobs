@@ -15,10 +15,8 @@ function configure_zen {
         oc_token=$(cat ${TOKEN_PATH}/token)
         oc_server='https://kubernetes.default.svc'
         oc login $oc_server --token=${oc_token} --certificate-authority=${CACERT} --kubeconfig="/tmp/config"
-        zen_admin_password=$(oc get secret admin-user-details -n cp4ba -o jsonpath='{.data.initial_admin_password}' | base64 -D)
+        zen_admin_password=$(oc get secret admin-user-details -n cp4ba -o jsonpath='{.data.initial_admin_password}' | base64 --decode)
         route=$(oc get route cpd -n $CP4BA_PROJECT_NAME -o jsonpath='{.spec.host}')
-
-
 
         ### ZEN ### 
         token_response=$(curl -k --request POST --header "Content-Type: application/json" --data "{\"username\":\"admin\", \"password\":\"$zen_admin_password\"}" https://$route/icp4d-api/v1/authorize)
@@ -99,6 +97,105 @@ function configure_zen {
 
 function configure_ier { 
     echo "Configuring IER"
+    tar xvf ierconfig.tar.gz
+    #####################################################
+    ########## VARIABLES AND CLUSTER AUTH ###############
+    #####################################################
+
+    CP4BA_PROJECT_NAME="cp4ba"
+    TOKEN_PATH=/var/run/secrets/kubernetes.io/serviceaccount
+    CACERT=${TOKEN_PATH}/ca.crt
+    oc_token=$(cat ${TOKEN_PATH}/token)
+    oc_server='https://kubernetes.default.svc'
+    oc login $oc_server --token=${oc_token} --certificate-authority=${CACERT} --kubeconfig="/tmp/config"
+    zen_admin_password=$(oc get secret admin-user-details -n cp4ba -o jsonpath='{.data.initial_admin_password}' | base64 --decode)
+    cpd_route=$(oc get route cpd -n $CP4BA_PROJECT_NAME -o jsonpath='{.spec.host}')
+
+
+    #####################################################
+    ######## PERFORM TEMPLATE SUBSTITUTIONS #############
+    #####################################################
+
+    # Variables to be replaced
+    ## cp4ba project name  above ## 
+    cp4ba_output_directory="cp4ba"
+    apps_endpoint_domain=$(oc --namespace openshift-ingress-operator get ingresscontrollers -o jsonpath='{$.items[0].status.domain}')
+    universal_password=$()
+
+    ## Confg.ini 
+    filepath="configure/configuration/config.ini"
+
+    sed -i -e 's/{{ cp4ba_output_directory }}/'$cp4ba_output_directory'/g' $filepath
+    sed -i -e 's/{{ universal_password }}/'$universal_password'/g' $filepath
+    sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAM'/g' $filepath
+    sed -i -e 's/{{ apps_endpoint_domain }}/'$apps_endpoint_domain'/g' $filepath
+
+    cat $filepath
+
+    ## configureworkflows.xml 
+    filepath="configure/profiles/configureWorkflows.xml"
+
+    sed -i -e 's/{{ cp4ba_output_directory }}/'$cp4ba_output_directory'/g' $filepath
+    sed -i -e 's/{{ universal_password }}/'$universal_password'/g' $filepath
+    sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAM'/g' $filepath
+    sed -i -e 's/{{ apps_endpoint_domain }}/'$apps_endpoint_domain'/g' $filepath
+
+    cat $filepath
+
+    #createMarkingSetsAndAddOns
+    filepath="configure/profiles/createMarkingSetsAndAddOns.xml"
+
+    sed -i -e 's/{{ cp4ba_output_directory }}/'$cp4ba_output_directory'/g' $filepath
+    sed -i -e 's/{{ universal_password }}/'$universal_password'/g' $filepath
+    sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAM'/g' $filepath
+    sed -i -e 's/{{ apps_endpoint_domain }}/'$apps_endpoint_domain'/g' $filepath
+
+    cat $filepath
+
+    # environment objects store
+    filepath="configure/profiles/environmentObjectStoreConfiguration.xml"
+    sed -i -e 's/{{ cp4ba_output_directory }}/'$cp4ba_output_directory'/g' $filepath
+    sed -i -e 's/{{ universal_password }}/'$universal_password'/g' $filepath
+    sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAM'/g' $filepath
+    sed -i -e 's/{{ apps_endpoint_domain }}/'$apps_endpoint_domain'/g' $filepath
+
+    cat $filepath
+
+    #####################################################
+    ########### ACCESS TOKEN AND API CALLS ##############
+    #####################################################
+
+
+    get_iam_token=$(curl -k --location --request POST 'https://cp-console.'$apps_endpoint_domain'/idprovider/v1/auth/identitytoken' \
+                --header 'Content-Type: application/json' \
+                --data-raw '{
+                    "grant_type":password,
+                    "username":cpadmin,
+                    "password":'$universal_password'
+                    }')
+    iam_access_token=$(echo $get_iam_token | jq -r '.access_token')
+
+    exchange_iam_for_zen=$(curl -k --location --request GET 'https://cpd-'$CP4BA_PROJECT_NAME'.'$apps_endpoint_domain'/v1/preauth/validateAuth' \
+                --header 'iam-token: '$iam_access_token'' \
+                --header 'username: cpadmin')
+
+    zen_access_token=$(echo $exchange_iam_for_zen | jq -r '.accessToken')
+
+    get_iam_token=$(curl -k --location --request POST 'https://cpd-'$CP4BA_PROJECT_NAME'.'$apps_endpoint_domain'/content-services-graphql/graphql' \
+                --header 'Content-Type: application/json' \
+                --header 'Authorization: Bearer '$token'' \
+                ## data raw should be: 
+                #  query: |
+                #     mutation CreateCodeModulesFolder {createFolder(repositoryIdentifier:
+                #     "FPOS", folderProperties: {name: "CodeModules", parent: {identifier: "/"} }) {id} } --> unsure how to do this with curl at the moment
+                --data-raw '{
+                    "grant_type":password,
+                    "username":cpadmin,
+                    "password":'$universal_password'
+                    }')
+
+    
+
 }
 
 function configure_ier_tm {
