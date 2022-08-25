@@ -97,7 +97,7 @@ function configure_zen {
 
 function configure_ier { 
     echo "Configuring IER"
-    tar xvf ierconfig.tar.gz
+    
     #####################################################
     ########## VARIABLES AND CLUSTER AUTH ###############
     #####################################################
@@ -108,19 +108,22 @@ function configure_ier {
     oc_token=$(cat ${TOKEN_PATH}/token)
     oc_server='https://kubernetes.default.svc'
     oc login $oc_server --token=${oc_token} --certificate-authority=${CACERT} --kubeconfig="/tmp/config"
+    
+
     zen_admin_password=$(oc get secret admin-user-details -n cp4ba -o jsonpath='{.data.initial_admin_password}' | base64 --decode)
     cpd_route=$(oc get route cpd -n $CP4BA_PROJECT_NAME -o jsonpath='{.spec.host}')
-
 
     #####################################################
     ######## PERFORM TEMPLATE SUBSTITUTIONS #############
     #####################################################
-
+    echo "Performing file templating"
     # Variables to be replaced
     ## cp4ba project name  above ## 
     cp4ba_output_directory="cp4ba"
     apps_endpoint_domain=$(oc --namespace openshift-ingress-operator get ingresscontrollers -o jsonpath='{$.items[0].status.domain}')
-    universal_password=$()
+    universal_password=$(oc get secret universal-password -n cp4ba -o jsonpath='{.data.universalPassword}' | base64 --decode)
+
+    tar xvf ierconfig.tar.gz
 
     ## Confg.ini 
     filepath="configure/configuration/config.ini"
@@ -165,34 +168,40 @@ function configure_ier {
     ########### ACCESS TOKEN AND API CALLS ##############
     #####################################################
 
-
     get_iam_token=$(curl -k --location --request POST 'https://cp-console.'$apps_endpoint_domain'/idprovider/v1/auth/identitytoken' \
-                --header 'Content-Type: application/json' \
-                --data-raw '{
-                    "grant_type":password,
-                    "username":cpadmin,
-                    "password":'$universal_password'
-                    }')
+    --header 'Content-Type: application/x-www-form-urlencoded' \
+    --data-urlencode 'scope=openid' \
+    --data-urlencode 'grant_type=password' \
+    --data-urlencode 'username=cpadmin' \
+    --data-urlencode 'password='$universal_password'')
+
     iam_access_token=$(echo $get_iam_token | jq -r '.access_token')
+    # echo $iam_access_token
 
     exchange_iam_for_zen=$(curl -k --location --request GET 'https://cpd-'$CP4BA_PROJECT_NAME'.'$apps_endpoint_domain'/v1/preauth/validateAuth' \
-                --header 'iam-token: '$iam_access_token'' \
-                --header 'username: cpadmin')
+    --header 'iam-token: '$iam_access_token'' \
+    --header 'username: cpadmin')
+
+    # echo $exchange_iam_for_zen
 
     zen_access_token=$(echo $exchange_iam_for_zen | jq -r '.accessToken')
 
-    get_iam_token=$(curl -k --location --request POST 'https://cpd-'$CP4BA_PROJECT_NAME'.'$apps_endpoint_domain'/content-services-graphql/graphql' \
-                --header 'Content-Type: application/json' \
-                --header 'Authorization: Bearer '$token'' \
-                ## data raw should be: 
-                #  query: |
-                #     mutation CreateCodeModulesFolder {createFolder(repositoryIdentifier:
-                #     "FPOS", folderProperties: {name: "CodeModules", parent: {identifier: "/"} }) {id} } --> unsure how to do this with curl at the moment
-                --data-raw '{
-                    "grant_type":password,
-                    "username":cpadmin,
-                    "password":'$universal_password'
-                    }')
+    echo "creating core modules"
+    ## It appears this endpoint is unavailable at the time of writing this script. Will need to investigate. 
+    create_core_modules=$(curl -k --location --request POST 'https://cpd-'$CP4BA_PROJECT_NAME'.'$apps_endpoint_domain'/content-services-graphql/graphql' \
+    --header 'Content-Type: application/json' \
+    --header 'Authorization: Bearer '$zen_access_token'' \
+    --data-raw 'query: | mutation CreateCodeModulesFolder {createFolder(repositoryIdentifier: "FPOS", folderProperties: {name: "CodeModules", parent: {identifier: "/"} }) {id} }')
+
+    echo $create_core_modules
+
+    echo "Running configuration tasks"
+    configure/configmgr_cl execute -task createMarkingSetsAndAddOns
+    configure/configmgr_cl execute -task configureFPOS
+    configure/configmgr_cl execute -task configureROS
+    configure/configmgr_cl execute -task configureWorkflows
+    configure/configmgr_cl execute -task transferWorkflows
+
 
     
 
