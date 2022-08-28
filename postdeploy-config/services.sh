@@ -2,19 +2,11 @@
 #!/bin/bash
 set +e
 
-
 function configure_zen { 
         ### VARIABLES ###
         ADMIN_USER_LIST='"zen_administrator_role","iaf-automation-admin","iaf-automation-analyst","iaf-automation-developer","iaf-automation-operator","zen_user_role"'
         USER_LIST='"iaf-automation-analyst","iaf-automation-developer","iaf-automation-operator","zen_user_role"'
 
-        ### OPENSHIFT ###
-        CP4BA_PROJECT_NAME="cp4ba"
-        TOKEN_PATH=/var/run/secrets/kubernetes.io/serviceaccount
-        CACERT=${TOKEN_PATH}/ca.crt
-        oc_token=$(cat ${TOKEN_PATH}/token)
-        oc_server='https://kubernetes.default.svc'
-        oc login $oc_server --token=${oc_token} --certificate-authority=${CACERT} --kubeconfig="/tmp/config"
         zen_admin_password=$(oc get secret admin-user-details -n cp4ba -o jsonpath='{.data.initial_admin_password}' | base64 --decode)
         route=$(oc get route cpd -n $CP4BA_PROJECT_NAME -o jsonpath='{.spec.host}')
 
@@ -50,6 +42,7 @@ function configure_zen {
                 "user_identifiers":[],
                 "ldap_groups":["cn='$admin_group_name',ou=Groups,dc=cp"]
                 }')
+
         # register ldap group with zen group cpadmins - this occurs twice in apollo best i can tell. dont need this one. 
         # register_ldap_with_zen=$(curl -k --location --request POST 'https://'$route'/usermgmt/v2/groups/'$admin_group_id'/members' \
         #     --header 'Content-Type: application/json' \
@@ -98,18 +91,6 @@ function configure_zen {
 function configure_ier { 
     echo "Configuring IER"
     
-    #####################################################
-    ########## VARIABLES AND CLUSTER AUTH ###############
-    #####################################################
-
-    CP4BA_PROJECT_NAME="cp4ba"
-    TOKEN_PATH=/var/run/secrets/kubernetes.io/serviceaccount
-    CACERT=${TOKEN_PATH}/ca.crt
-    oc_token=$(cat ${TOKEN_PATH}/token)
-    oc_server='https://kubernetes.default.svc'
-    oc login $oc_server --token=${oc_token} --certificate-authority=${CACERT} --kubeconfig="/tmp/config"
-    
-
     zen_admin_password=$(oc get secret admin-user-details -n cp4ba -o jsonpath='{.data.initial_admin_password}' | base64 --decode)
     cpd_route=$(oc get route cpd -n $CP4BA_PROJECT_NAME -o jsonpath='{.spec.host}')
 
@@ -202,15 +183,29 @@ function configure_ier {
     configure/configmgr_cl execute -task configureWorkflows
     configure/configmgr_cl execute -task transferWorkflows
 
-
+  
     
 
 }
 
 function configure_ier_tm {
     echo "Configuring IER-TM"
+
+    tm_pod_name=$(oc get pods -l app=icp4adeploy-tm-deploy -o jsonpath='{.items[0].metadata.name}')
+    echo "copying additional jar files to /opt/ibm/extTM in $tm_pod_name"
+    oc cp ier/AdditionalJars.tar.gz  "$tm_pod_name:/tmp/AdditionalJars.tar.gz" -n $CP4BA_PROJECT_NAME
+    oc exec $tm_pod_name -it -- tar xvf /tmp/AdditionalJars.tar.gz -C /opt/ibm/extTM//
+
+    echo "Bouncing tm pod"
+
+    # depending on how this works it might be better practice to scale the deployment to 0 and then scale back up. 
+    oc delete pod $tm_pod_name -n $CP4BA_PROJECT_NAME
+
+    configure_tm
 }
 
 function configure_tm { 
     echo -n "Configuring TM"
+
+
 }

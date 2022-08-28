@@ -7,8 +7,13 @@ source ./services.sh
 echo "started post deploy config"
 TOKEN_PATH=/var/run/secrets/kubernetes.io/serviceaccount
 CACERT=${TOKEN_PATH}/ca.crt
-CP4BA_NAMESPACE="cp4ba"
-
+ ### OPENSHIFT ###
+CP4BA_PROJECT_NAME="cp4ba"
+TOKEN_PATH=/var/run/secrets/kubernetes.io/serviceaccount
+CACERT=${TOKEN_PATH}/ca.crt
+oc_token=$(cat ${TOKEN_PATH}/token)
+oc_server='https://kubernetes.default.svc'
+oc login $oc_server --token=${oc_token} --certificate-authority=${CACERT} --kubeconfig="/tmp/config"
 
 # set +e so the job executes without failing and doesnt hold up future sync waves
 set +e 
@@ -32,12 +37,9 @@ function postdeploy_config {
                 configure_ier
                 
                 ;;
-            IER-TM) 
+            TM) 
                 configure_ier_tm
                 
-                ;;
-            TM) 
-                configure_tm
                 ;;
             *)
                 echo "Service not yet configured. Please modify bash script or check arguments"
