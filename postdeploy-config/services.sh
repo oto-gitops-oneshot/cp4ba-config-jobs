@@ -102,7 +102,7 @@ function configure_ier {
 
         sed -i -e 's/{{ cp4ba_output_directory }}/'$cp4ba_output_directory'/g' $filepath
         sed -i -e 's/{{ universal_password }}/'$universal_password'/g' $filepath
-        sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAM'/g' $filepath
+        sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAME'/g' $filepath
         sed -i -e 's/{{ apps_endpoint_domain }}/'$apps_endpoint_domain'/g' $filepath
 
         cat $filepath
@@ -112,7 +112,7 @@ function configure_ier {
 
         sed -i -e 's/{{ cp4ba_output_directory }}/'$cp4ba_output_directory'/g' $filepath
         sed -i -e 's/{{ universal_password }}/'$universal_password'/g' $filepath
-        sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAM'/g' $filepath
+        sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAME'/g' $filepath
         sed -i -e 's/{{ apps_endpoint_domain }}/'$apps_endpoint_domain'/g' $filepath
 
         cat $filepath
@@ -122,7 +122,7 @@ function configure_ier {
 
         sed -i -e 's/{{ cp4ba_output_directory }}/'$cp4ba_output_directory'/g' $filepath
         sed -i -e 's/{{ universal_password }}/'$universal_password'/g' $filepath
-        sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAM'/g' $filepath
+        sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAME'/g' $filepath
         sed -i -e 's/{{ apps_endpoint_domain }}/'$apps_endpoint_domain'/g' $filepath
 
         cat $filepath
@@ -131,7 +131,7 @@ function configure_ier {
         filepath="cp4ba/ierconfig/configure/profiles/environmentObjectStoreConfiguration.xml"
         sed -i -e 's/{{ cp4ba_output_directory }}/'$cp4ba_output_directory'/g' $filepath
         sed -i -e 's/{{ universal_password }}/'$universal_password'/g' $filepath
-        sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAM'/g' $filepath
+        sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAME'/g' $filepath
         sed -i -e 's/{{ apps_endpoint_domain }}/'$apps_endpoint_domain'/g' $filepath
 
         cat $filepath
@@ -163,13 +163,14 @@ function configure_ier {
         create_core_modules=$(curl -k --location --request POST 'https://cpd-'$CP4BA_PROJECT_NAME'.'$apps_endpoint_domain'/content-services-graphql/graphql' \
         --header 'Content-Type: application/json' \
         --header 'Authorization: Bearer '$zen_access_token'' \
-        --data-raw 'query: | mutation CreateCodeModulesFolder {createFolder(repositoryIdentifier: "FPOS", folderProperties: {name: "CodeModules", parent: {identifier: "/"} }) {id} }')
+       --data-raw '{"query": "mutation CreateCodeModulesFolder {createFolder(repositoryIdentifier: \"FPOS\", folderProperties: {name: \"CodeModules\", parent: {identifier:\"/\"} }) {id} }"}
+//query: | mutation CreateCodeModulesFolder {createFolder(repositoryIdentifier: "FPOS", folderProperties: {name: "CodeModules", parent: {identifier: "/"} }) {id} }')
 
         echo $create_core_modules
         
         echo "Running configuration tasks"
 
-        sleep 2000
+        sleep 5000
         ## this appears to be an issue for now. We dont have the filenet jars here. 
         cp4ba/ierconfig/configure/configmgr_cl execute -task createMarkingSetsAndAddOns
         cp4ba/ierconfig/configure/configmgr_cl execute -task configureFPOS
