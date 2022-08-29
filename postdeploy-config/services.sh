@@ -183,6 +183,13 @@ function configure_ier {
     configure/configmgr_cl execute -task configureWorkflows
     configure/configmgr_cl execute -task transferWorkflows
 
+    # filesystem cleanup
+    rm -rf CommonFiles/
+    rm -rf configure/
+    rm -rf Plugins/
+    rm -rf Workflows/
+    rm version.txt
+
   
     
 
@@ -197,6 +204,9 @@ function configure_ier_tm {
     oc exec $tm_pod_name -it -- tar xvf /tmp/AdditionalJars.tar.gz -C /opt/ibm/extTM//
 
     echo "Bouncing tm pod"
+
+    # filesystem cleanup
+    oc exec $tm_pod_name rm /tmp/AdditionalJars.tar.gz -n $CP4BA_PROJECT_NAME
 
     # depending on how this works it might be better practice to scale the deployment to 0 and then scale back up. 
     oc delete pod $tm_pod_name -n $CP4BA_PROJECT_NAME

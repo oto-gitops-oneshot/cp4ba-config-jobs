@@ -66,6 +66,9 @@ function seed_databases {
     echo "To list the databases, run:"
     echo "oc exec $DB2_POD_NAME -c db2u -- su - db2inst1 -c \"db2 list database directory\""
 
+    # filesystem cleanup
+    rm -rf /tmp/commands
+
 }
 
 function create_users {
