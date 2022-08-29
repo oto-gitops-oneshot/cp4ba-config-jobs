@@ -46,13 +46,6 @@ function update_secrets {
 
 function seed_databases {
     echo $execstr > /tmp/commands
-    DB2_COMMANDS="/tmp/commands"
-    
-    echo "setting project to $DB2_NAMESPACE" && echo
-    oc project $DB2_NAMESPACE
-
-    echo "Identifying DB2 pod" && echo
-    DB2_POD_NAME=$(oc get pod -l role=db -ojsonpath='{.items[0].metadata.name}')
 
     echo "Listing current databases on pod $DB2_POD_NAME" && echo
     oc exec $DB2_POD_NAME -c db2u -- su - db2inst1 -c "db2 list database directory"
@@ -65,9 +58,6 @@ function seed_databases {
     echo "Database setup in progress" && echo
     echo "To list the databases, run:"
     echo "oc exec $DB2_POD_NAME -c db2u -- su - db2inst1 -c \"db2 list database directory\""
-
-    # filesystem cleanup
-    oc exec $DB2_POD_NAME -c db2u rm -f DB2_COMMANDS
 
 }
 
@@ -109,8 +99,17 @@ while getopts ":i:" opt; do
       oc_token=$(cat ${TOKEN_PATH}/token)
       oc_server='https://kubernetes.default.svc'
       oc login $oc_server --token=${oc_token} --certificate-authority=${CACERT} --kubeconfig="/tmp/config"
-      # echo "Updating secrets"
-      # update_secrets
+
+      echo "setting project to $DB2_NAMESPACE" && echo
+      oc project $DB2_NAMESPACE
+
+      echo "Identifying DB2 pod" && echo
+      DB2_POD_NAME=$(oc get pod -l role=db -ojsonpath='{.items[0].metadata.name}')
+
+      DB2_COMMANDS="/tmp/commands"
+      
+      # echo "Updating secrets" (This may not be required after all - remove after testing)
+      # update_secrets 
 
       for i in "${argv[@]}"; do
         if [[ $supported_databases =~ (^|[[:space:]])$i($|[[:space:]]) ]];  then
@@ -126,6 +125,8 @@ while getopts ":i:" opt; do
 
       # filesystem cleanup
       rm -f /tmp/commands
+      oc exec $DB2_POD_NAME -c db2u rm -f DB2_COMMANDS
+
       
       ;;
     \?)
