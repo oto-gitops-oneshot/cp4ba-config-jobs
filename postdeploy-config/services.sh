@@ -177,17 +177,6 @@ function configure_ier {
         cp4ba/ierconfig/configure/configmgr_cl execute -task configureWorkflows
         cp4ba/ierconfig/configure/configmgr_cl execute -task transferWorkflows
 
-
-        # filesystem cleanup
-        rm -rf CommonFiles/
-        rm -rf configure/
-        rm -rf Plugins/
-        rm -rf Workflows/
-        rm version.txt
-
-    
-        
-
 }
 
 function configure_ier_tm {
@@ -197,10 +186,6 @@ function configure_ier_tm {
         echo "copying additional jar files to /opt/ibm/extTM in $tm_pod_name"
         oc cp ier/AdditionalJars.tar.gz  "$tm_pod_name:/tmp/AdditionalJars.tar.gz" -n $CP4BA_PROJECT_NAME
         oc exec $tm_pod_name -it -- tar xvf /tmp/AdditionalJars.tar.gz -C /opt/ibm/extTM//
-
-
-        # filesystem cleanup
-        oc exec $tm_pod_name rm /tmp/AdditionalJars.tar.gz -n $CP4BA_PROJECT_NAME
 
         echo "Bouncing tm pod"
 
