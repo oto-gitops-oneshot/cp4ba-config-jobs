@@ -66,6 +66,9 @@ function seed_databases {
     echo "To list the databases, run:"
     echo "oc exec $DB2_POD_NAME -c db2u -- su - db2inst1 -c \"db2 list database directory\""
 
+    # filesystem cleanup
+    oc exec $DB2_POD_NAME -c db2u rm -f DB2_COMMANDS
+
 }
 
 function create_users {
@@ -120,6 +123,9 @@ while getopts ":i:" opt; do
           echo "Initialisation of database $i is not yet supported"
         fi
       done
+
+      # filesystem cleanup
+      rm -f /tmp/commands
       
       ;;
     \?)

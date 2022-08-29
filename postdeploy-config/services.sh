@@ -177,9 +177,6 @@ function configure_ier {
         cp4ba/ierconfig/configure/configmgr_cl execute -task configureWorkflows
         cp4ba/ierconfig/configure/configmgr_cl execute -task transferWorkflows
 
-    
-        
-
 }
 
 function configure_ier_tm {
