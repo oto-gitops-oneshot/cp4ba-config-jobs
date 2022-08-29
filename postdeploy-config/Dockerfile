@@ -2,8 +2,9 @@ FROM registry.access.redhat.com/ubi9/ubi-minimal
 WORKDIR ~
 COPY postdeploy-config.sh postdeploy-config.sh
 COPY services.sh services.sh
-COPY ier/ierconfig.tar.gz ierconfig.tar.gz
-RUN chmod 777 ierconfig.tar.gz
+COPY ier/ierconfig.tar.gz cp4ba/ierconfig/ierconfig.tar.gz
+COPY ier/AdditionalJars.tar.gz ier/AdditionalJars.tar.gz
+RUN chmod 777 cp4ba/ierconfig/ierconfig.tar.gz
 RUN chmod a+x postdeploy-config.sh
 RUN chmod a+x services.sh
 ENV JAVA_HOME=/etc/alternatives/jre
