@@ -170,7 +170,6 @@ function configure_ier {
         
         echo "Running configuration tasks"
 
-        sleep 5000
         ## this appears to be an issue for now. We dont have the filenet jars here. 
         cp4ba/ierconfig/configure/configmgr_cl execute -task createMarkingSetsAndAddOns
         cp4ba/ierconfig/configure/configmgr_cl execute -task configureFPOS
@@ -200,5 +199,71 @@ function configure_ier_tm {
 function configure_tm { 
     echo -n "Configuring TM"
 
+        get_iam_token=$(curl -k --location --request POST 'https://cp-console.'$apps_endpoint_domain'/idprovider/v1/auth/identitytoken' \
+        --header 'Content-Type: application/x-www-form-urlencoded' \
+        --data-urlencode 'scope=openid' \
+        --data-urlencode 'grant_type=password' \
+        --data-urlencode 'username=cpadmin' \
+        --data-urlencode 'password='$universal_password'')
+
+        iam_access_token=$(echo $get_iam_token | jq -r '.access_token')
+
+        exchange_iam_for_zen=$(curl -k --location --request GET 'https://cpd-'$CP4BA_PROJECT_NAME'.'$apps_endpoint_domain'/v1/preauth/validateAuth' \
+                --header 'iam-token: '$iam_access_token'' \
+                --header 'username: cpadmin')
+
+        zen_access_token=$(echo $exchange_iam_for_zen | jq -r '.accessToken')
+
+        $iam_logon=$(curl -k --location --request POST 'https://cpd-'$CP4BA_PROJECT_NAME'.'$apps_endpoint_domain'/icn/navigator/jaxrs/logon' \
+        --header 'auth-token-realm: InternalIamRealm' \
+        --header 'Content-Type: application/x-www-form-urlencoded' \
+        --header 'Authorization: Bearer '$zen_access_token'')
+
+        security_token=$(echo $iam_login | jq -r '.security_token')
+
+        set_tm_service_url=$(curl -k --location --request POST 'https://cpd-'$CP4BA_PROJECT_NAME'.'$apps_endpoint_domain'/icn/navigator/jaxrs/api/admin/configuration/settings/default/taskManagerServiceURL' \
+        --header 'Connection: keep-alive' \
+        --header 'security_token: '$security_token'' \
+        --header 'auth-token-realm: InternalIamRealm' \
+        --header 'Authorization: Bearer '$zen_access_token'' \
+        --header 'Content-Type: application/x-www-form-urlencoded' \
+        --data-urlencode 'desktop=admin' \
+        --data-urlencode 'value=https://cpd-'$CP4BA_PROJECT_NAME'.'$apps_endpoint_domain'/tm/api/v1')
+
+        set_tm_log_dir=$(curl -k --location --request POST 'https://cpd-'$CP4BA_PROJECT_NAME'.'$apps_endpoint_domain'/icn/navigator/jaxrs/api/admin/configuration/settings/default/taskManagerLogDirectory' \
+        --header 'Connection: keep-alive' \
+        --header 'security_token: '$security_token'' \
+        --header 'Authorization: Bearer '$zen_access_token'' \
+        --header 'Content-Type: application/x-www-form-urlencoded' \
+        --data-urlencode 'desktop=admin' \
+        --data-urlencode 'value=/opt/ibm/viewerconfig/logs/' \
+        --data-urlencode 'auth-token-realm=InternalIamRealm')
+
+        set_tm_admin_uid=$(curl -k --location --request POST 'https://cpd-'$CP4BA_PROJECT_NAME'.'$apps_endpoint_domain'/icn/navigator/jaxrs/api/admin/configuration/settings/default/taskManagerAdminUserId' \
+        --header 'auth-token-realm: InternalIamRealm' \
+        --header 'Connection: keep-alive' \
+        --header 'security_token: '$security_token'' \
+        --header 'Authorization: Bearer '$zen_access_token'' \
+        --header 'Content-Type: application/x-www-form-urlencoded' \
+        --data-urlencode 'desktop=admin' \
+        --data-urlencode 'value=cpadmin')
+
+        set_tm_admin_password=$(curl -k --location --request POST 'https://cpd-'$CP4BA_PROJECT_NAME'.'$apps_endpoint_domain'/icn/navigator/jaxrs/api/admin/configuration/settings/default/taskManagerAdminPassword' \
+        --header 'Connection: keep-alive' \
+        --header 'security_token: '$security_token'' \
+        --header 'auth-token-realm: InternalIamRealm' \
+        --header 'Authorization: Bearer '$zen_access_token'' \
+        --header 'Content-Type: application/x-www-form-urlencoded' \
+        --data-urlencode 'desktop=admin' \
+        --data-urlencode 'value='$universal_password'')
+
+        enable_tm=$(curl -k --location --request POST 'https://cpd-'$CP4BA_PROJECT_NAME'.'$apps_endpoint_domain'/icn/navigator/jaxrs/api/admin/configuration/settings/default/taskManagerServiceEnabled' \
+        --header 'Connection: keep-alive' \
+        --header 'security_token: '$security_token'' \
+        --header 'auth-token-realm: InternalIamRealm' \
+        --header 'Authorization: Bearer '$zen_access_token'' \
+        --header 'Content-Type: application/x-www-form-urlencoded' \
+        --data-urlencode 'desktop=admin' \
+        --data-urlencode 'value=true')
 
 }

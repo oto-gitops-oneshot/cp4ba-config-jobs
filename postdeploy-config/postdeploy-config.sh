@@ -5,11 +5,8 @@
 # reference the trello for specific tasks relevant to this project
 source ./services.sh
 
-
-
 # set +e so the job executes without failing and doesnt hold up future sync waves
 set +e 
-
 
 echo "started post deploy config"
  ### OPENSHIFT ###
@@ -19,7 +16,6 @@ CACERT=${TOKEN_PATH}/ca.crt
 oc_token=$(cat ${TOKEN_PATH}/token)
 oc_server='https://kubernetes.default.svc'
 oc login $oc_server --token=${oc_token} --certificate-authority=${CACERT} --kubeconfig="/tmp/config"
-
 
 
 oc project $CP4BA_PROJECT_NAME
