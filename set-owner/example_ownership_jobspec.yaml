@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cp4ba-set-owner
+  namespace: cp4ba
+spec:
+  template:
+    spec:
+      serviceAccountName: ibm-cp4a-operator
+      containers:
+      - name: set-ownership
+        image: quay.io/mikhail_nikitin1/cp4ba_ownership # image to pull
+        command: ["./set_owner.sh"]
+        env:
+        - name: KUBECONFIG
+          value: "/tmp/config"
+        imagePullPolicy: Always
+      restartPolicy: OnFailure
+  backoffLimit: 2
+  
