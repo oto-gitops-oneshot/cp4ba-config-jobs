@@ -127,7 +127,3 @@ function init_IER_db {
     }\n"
     printf "$ros_init_cmd"
 }
-
-
-
-

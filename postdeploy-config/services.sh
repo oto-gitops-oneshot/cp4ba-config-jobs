@@ -177,9 +177,6 @@ function configure_ier {
         /ierconfig/configure/configmgr_cl execute -task configureWorkflows
         /ierconfig/configure/configmgr_cl execute -task transferWorkflows
 
-    
-        
-
 }
 
 function configure_ier_tm {

@@ -64,6 +64,9 @@ else
 
     # create ht ecp4ba-root-ca
     oc create secret tls cp4ba-root-ca --cert=$dir_path/global-ca.crt --key=$dir_path/global-ca.key -n cp4ba
+
+    # filesystem cleanup
+    rm -rf $dir_path
 fi
 
 
