@@ -58,7 +58,7 @@ function postdeploy_config {
 
   fi
   # if both ier and tm are true then we must do extra configuration 
-  if [ $ier = true && $tm = true] ; then
+  if [ $ier = true ] && [ $tm = true ] ; then
     configure_ier_tm
   fi 
     

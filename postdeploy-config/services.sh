@@ -91,14 +91,14 @@ function configure_ier {
         echo "Performing file templating"
         # Variables to be replaced
         ## cp4ba project name  above ## 
-        cp4ba_output_directory="cp4ba"
+        cp4ba_output_directory=""
         apps_endpoint_domain=$(oc --namespace openshift-ingress-operator get ingresscontrollers -o jsonpath='{$.items[0].status.domain}')
         universal_password=$(oc get secret universal-password -n cp4ba -o jsonpath='{.data.universalPassword}' | base64 --decode)
 
-        tar xvf cp4ba/ierconfig/ierconfig.tar.gz --directory cp4ba/ierconfig/
+        tar xvf /ierconfig/ierconfig.tar.gz --directory /ierconfig/
 
         ## Confg.ini 
-        filepath="cp4ba/ierconfig/configure/configuration/config.ini"
+        filepath="/ierconfig/configure/configuration/config.ini"
 
         sed -i -e 's/{{ cp4ba_output_directory }}/'$cp4ba_output_directory'/g' $filepath
         sed -i -e 's/{{ universal_password }}/'$universal_password'/g' $filepath
@@ -108,7 +108,7 @@ function configure_ier {
         cat $filepath
 
         ## configureworkflows.xml 
-        filepath="cp4ba/ierconfig/configure/profiles/configureWorkflows.xml"
+        filepath="/ierconfig/configure/profiles/configureWorkflows.xml"
 
         sed -i -e 's/{{ cp4ba_output_directory }}/'$cp4ba_output_directory'/g' $filepath
         sed -i -e 's/{{ universal_password }}/'$universal_password'/g' $filepath
@@ -118,7 +118,7 @@ function configure_ier {
         cat $filepath
 
         #createMarkingSetsAndAddOns
-        filepath="cp4ba/ierconfig/configure/profiles/createMarkingSetsAndAddOns.xml"
+        filepath="/ierconfig/configure/profiles/createMarkingSetsAndAddOns.xml"
 
         sed -i -e 's/{{ cp4ba_output_directory }}/'$cp4ba_output_directory'/g' $filepath
         sed -i -e 's/{{ universal_password }}/'$universal_password'/g' $filepath
@@ -128,7 +128,7 @@ function configure_ier {
         cat $filepath
 
         # environment objects store
-        filepath="cp4ba/ierconfig/configure/profiles/environmentObjectStoreConfiguration.xml"
+        filepath="/ierconfig/configure/profiles/environmentObjectStoreConfiguration.xml"
         sed -i -e 's/{{ cp4ba_output_directory }}/'$cp4ba_output_directory'/g' $filepath
         sed -i -e 's/{{ universal_password }}/'$universal_password'/g' $filepath
         sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAME'/g' $filepath
@@ -171,11 +171,11 @@ function configure_ier {
         echo "Running configuration tasks"
 
         ## this appears to be an issue for now. We dont have the filenet jars here. 
-        cp4ba/ierconfig/configure/configmgr_cl execute -task createMarkingSetsAndAddOns
-        cp4ba/ierconfig/configure/configmgr_cl execute -task configureFPOS
-        cp4ba/ierconfig/configure/configmgr_cl execute -task configureROS
-        cp4ba/ierconfig/configure/configmgr_cl execute -task configureWorkflows
-        cp4ba/ierconfig/configure/configmgr_cl execute -task transferWorkflows
+        /ierconfig/configure/configmgr_cl execute -task createMarkingSetsAndAddOns
+        /ierconfig/configure/configmgr_cl execute -task configureFPOS
+        /ierconfig/configure/configmgr_cl execute -task configureROS
+        /ierconfig/configure/configmgr_cl execute -task configureWorkflows
+        /ierconfig/configure/configmgr_cl execute -task transferWorkflows
 
     
         
