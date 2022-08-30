@@ -31,6 +31,8 @@ do
       echo "Patching resource with type: " $resource_type " and name: " $resource_name;
       patch=$(echo oc patch $resource_type $resource_name --patch "'{ \"metadata\":{\"ownerReferences\": [ {\"apiVersion\": \"icp4a.ibm.com/v1\", \"kind\": \"ICP4ACluster\", \"name\": \"icp4adeploy\", \"uid\": \"${cp4ba_uid}\" } ]}}'");
       eval $patch;
+    else
+      echo "There is an owner already for " $resource_name;
     fi
   else
     echo $resource_name " is not found in the cluster"
