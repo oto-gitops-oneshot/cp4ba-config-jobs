@@ -1,6 +1,3 @@
-cp4a-shared-log-pvc
-testing
-testmap-mn
 datadir-zen-metastoredb-0
 datadir-zen-metastoredb-1
 datadir-zen-metastoredb-2
