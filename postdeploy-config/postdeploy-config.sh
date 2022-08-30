@@ -47,7 +47,7 @@ function postdeploy_config {
                 
                 ;;
             tm) 
-                configure_ier_tm
+                configure_tm
                 tm=true
                 ;;
             *)

@@ -105,7 +105,7 @@ function configure_ier {
         sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAME'/g' $filepath
         sed -i -e 's/{{ apps_endpoint_domain }}/'$apps_endpoint_domain'/g' $filepath
 
-        cat $filepath
+        # cat $filepath
 
         ## configureworkflows.xml 
         filepath="/ierconfig/configure/profiles/configureWorkflows.xml"
@@ -115,7 +115,7 @@ function configure_ier {
         sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAME'/g' $filepath
         sed -i -e 's/{{ apps_endpoint_domain }}/'$apps_endpoint_domain'/g' $filepath
 
-        cat $filepath
+        # cat $filepath
 
         #createMarkingSetsAndAddOns
         filepath="/ierconfig/configure/profiles/createMarkingSetsAndAddOns.xml"
@@ -125,7 +125,7 @@ function configure_ier {
         sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAME'/g' $filepath
         sed -i -e 's/{{ apps_endpoint_domain }}/'$apps_endpoint_domain'/g' $filepath
 
-        cat $filepath
+        # cat $filepath
 
         # environment objects store
         filepath="/ierconfig/configure/profiles/environmentObjectStoreConfiguration.xml"
@@ -134,7 +134,7 @@ function configure_ier {
         sed -i -e 's/{{ cp4ba_project_name }}/'$CP4BA_PROJECT_NAME'/g' $filepath
         sed -i -e 's/{{ apps_endpoint_domain }}/'$apps_endpoint_domain'/g' $filepath
 
-        cat $filepath
+        # cat $filepath
 
         #####################################################
         ########### ACCESS TOKEN AND API CALLS ##############
@@ -171,11 +171,11 @@ function configure_ier {
         echo "Running configuration tasks"
 
         ## this appears to be an issue for now. We dont have the filenet jars here. 
-        /ierconfig/configure/configmgr_cl execute -task createMarkingSetsAndAddOns
-        /ierconfig/configure/configmgr_cl execute -task configureFPOS
-        /ierconfig/configure/configmgr_cl execute -task configureROS
-        /ierconfig/configure/configmgr_cl execute -task configureWorkflows
-        /ierconfig/configure/configmgr_cl execute -task transferWorkflows
+        /ierconfig/configure/configmgr_cl execute -task createMarkingSetsAndAddOns -data /ierconfig/.metadata
+        /ierconfig/configure/configmgr_cl execute -task configureFPOS -data /ierconfig/.metadata
+        /ierconfig/configure/configmgr_cl execute -task configureROS -data /ierconfig/.metadata
+        /ierconfig/configure/configmgr_cl execute -task configureWorkflows -data /ierconfig/.metadata
+        /ierconfig/configure/configmgr_cl execute -task transferWorkflows -data /ierconfig/.metadata
 
 }
 
