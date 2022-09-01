@@ -17,7 +17,7 @@ spec:
           value: "gcd,fpos,ros,icndb,os1"
         - name: KUBECONFIG
           value: "/tmp/config"
-        args: ["-i", "CP4BA,BAN,FNCM,IER"]
+        args: ["-i", "BAN,FNCM,IER"]
         imagePullPolicy: Always
       restartPolicy: OnFailure
   backoffLimit: 2

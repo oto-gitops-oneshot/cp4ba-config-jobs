@@ -111,6 +111,11 @@ while getopts ":i:" opt; do
       # echo "Updating secrets" (This may not be required after all - remove after testing)
       # update_secrets 
 
+      execstr=$(init_CP4BA_db);
+      echo "Executing create DB commands for $i: ";
+      echo $execstr;
+      seed_databases
+      
       for i in "${argv[@]}"; do
         if [[ $supported_databases =~ (^|[[:space:]])$i($|[[:space:]]) ]];  then
           # spit create db commands to stdout and capture them into a variable
