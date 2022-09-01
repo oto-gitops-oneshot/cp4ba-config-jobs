@@ -68,8 +68,8 @@ function create_users {
     echo "user list empty" 
     # we can leave it up to people to provide no user list if they have precreated users. If we want to ensure a user list is provided we can exit 1
   else 
-    # - this secret has been created manually at the moment but we will external secrets this separately
-    UNIVERSAL_PASSWORD=$(oc get secret dbs-universal-password -n $CP4BA_NAMESPACE -o jsonpath='{.data.UNIVERSAL_PASSWORD}' | base64 --decode) 
+    # The secret universal-password is already created at this stage. This job has a sync wave of 282 and the secret is at wave 250.
+    UNIVERSAL_PASSWORD=$(oc get secret universal-password -n $CP4BA_NAMESPACE -o jsonpath='{.data.UNIVERSAL_PASSWORD}' | base64 --decode) 
     DB2_LDAP_POD_NAME=$(oc get pod -l role=ldap -ojsonpath='{.items[0].metadata.name}')
 
     # We can pass in a list of separated users as an env variable. 
@@ -115,7 +115,7 @@ while getopts ":i:" opt; do
       echo "Executing create DB commands for $i: ";
       echo $execstr;
       seed_databases
-      
+
       for i in "${argv[@]}"; do
         if [[ $supported_databases =~ (^|[[:space:]])$i($|[[:space:]]) ]];  then
           # spit create db commands to stdout and capture them into a variable
