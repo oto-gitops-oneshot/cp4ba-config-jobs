@@ -2,23 +2,23 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: database-configuration
+  # can change this to cp4ba if we need to, but the job is ALL about configruing db2 for cp4ba so this seems like good separation to me. 
   namespace: db2
 spec:
   template:
     spec:
       serviceAccountName: db2-configure-sa
       containers:
-      - name: db-config
-        image: quay.io/langley_millard_ibm/dbs_configure # location the image is pushed to i.e. quay.io/langley_millard_ibm/repo_name
+      - name: dbs-config
+        image: quay.io/mikhail_nikitin1/db2init:latest # location the image is pushed to i.e. quay.io/langley_millard_ibm/repo_name
         command: ["./create_db.sh"]
         env:
         - name: USER_LIST
           value: "gcd,fpos,ros,icndb,os1"
         - name: KUBECONFIG
           value: "/tmp/config"
-        args: ["-i", "BAN,FNCM,IER"]
+        args: ["-i", "CP4BA,BAN,FNCM,IER"]
         imagePullPolicy: Always
       restartPolicy: OnFailure
   backoffLimit: 2
-  # path to preconfigure job git repo https://github.com/oto-cp4ba-gitops/cp4ba-config-jobs
-  # branch is origin/feature/multi-db-init-mn
+  # path to preconfigure job git repo https://github.com/oto-cp4ba-gitops/dbs-configure-job
