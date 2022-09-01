@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # define the list of supported databases here
-supported_databases='CP4BA IER FNCM BAN'
+supported_databases='IER FNCM BAN'
 
 # setting +e so as the job doesnt fail and hold up future sync waves
 set +e
