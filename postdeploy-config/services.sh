@@ -195,6 +195,7 @@ function configure_ier_tm {
 
 function configure_tm { 
     echo -n "Configuring TM"
+        apps_endpoint_domain=$(oc --namespace openshift-ingress-operator get ingresscontrollers -o jsonpath='{$.items[0].status.domain}')
 
         get_iam_token=$(curl -k --location --request POST 'https://cp-console.'$apps_endpoint_domain'/idprovider/v1/auth/identitytoken' \
         --header 'Content-Type: application/x-www-form-urlencoded' \
