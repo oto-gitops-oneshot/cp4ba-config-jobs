@@ -1,4 +1,4 @@
-apiVersion: batch/v1
+=apiVersion: batch/v1
 kind: Job
 metadata:
   name: certificate-configuration
@@ -11,11 +11,15 @@ spec:
       - name: init-certs
         image: quay.io/langley_millard_ibm/predeploy-certs # location the image is pushed to i.e. quay.io/langley_millard_ibm/repo_name
         command: ["./cert_gen.sh"]
+        volumeMounts:
+        - mountPath: /certs
+          name: cert-volume
         env:
         - name: KUBECONFIG
           value: "/tmp/config"
         imagePullPolicy: Always
+      volumes:
+      - name: cert-volume
+        emptyDir: {}
       restartPolicy: OnFailure
   backoffLimit: 2
-  # path to preconfigure job git repo https://github.com/oto-cp4ba-gitops/cp4ba-config-jobs
-  # branch is origin/feature/multi-db-init-mn

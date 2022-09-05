@@ -24,16 +24,17 @@ echo $global_ca_exists
 echo $cp4ba_root_ca_exists
 
 
-if [ "$external_tls_secret_exists" = "external-tls-secret" ] | [ "$global_ca_exists" = "global-ca" ] | [ "$cp4ba_root_ca_exists" = "cp4ba-root-ca" ]; then
+if [ "$external_tls_secret_exists" = "external-tls-secret" ] | [ "$global_ca_exists" = "global-ca" ] | [ "$cp4ba_root_ca_exists" = "cp4ba-root-ca" ] 
+then
     echo "A secret already exists. Please delete external-tls-secret, global-ca and cp4ba-root-ca in the $CP4BA_NAMESPACE namespace and run this job again."
     sleep 10 
     exit 0
 else
     echo "creating certs dir"
-    dir_path=certificates
-    mkdir -p $dir_path
-    chmod -R 777 $dir_path
+    
+    echo "dir path is $dirpath"
     echo "generating ca"
+    dir_path=/certificates
     openssl req -new -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -days 36500 -nodes -x509 -subj "/CN='Global CA'" -keyout $dir_path/global-ca.key -out $dir_path/global-ca.crt
 
     # Wildcard cert
@@ -46,7 +47,6 @@ else
 
     openssl x509 -req -days 36500 -in $dir_path/wildcard.csr -CA $dir_path/global-ca.crt -CAkey $dir_path/global-ca.key -out $dir_path/wildcard.crt
 
-    chmod 777 -R $dir_path
 
     global_ca_cert=`cat $dir_path/global-ca.crt`
     global_ca_key=`cat $dir_path/global-ca.key`
@@ -65,8 +65,6 @@ else
     # create ht ecp4ba-root-ca
     oc create secret tls cp4ba-root-ca --cert=$dir_path/global-ca.crt --key=$dir_path/global-ca.key -n cp4ba
 
-    # filesystem cleanup
-    rm -rf $dir_path
 fi
 
 
