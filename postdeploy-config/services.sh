@@ -92,7 +92,12 @@ function configure_ier {
         # Variables to be replaced
         ## cp4ba project name  above ## 
         cp4ba_output_directory=""
-        apps_endpoint_domain=$(oc --namespace openshift-ingress-operator get ingresscontrollers -o jsonpath='{$.items[0].status.domain}')
+         # REFACTOR
+        # route=$(oc get route cpd -n $CP4BA_PROJECT_NAME -o jsonpath='{.spec.host}')
+        # searchstring="cpd-$CP4BA_PROJECT_NAME."
+        # apps_endpoint_domain=${route#*$searchstring}
+        apps_endpoint_domain="itzroks-66300275ko-2u9lcj-4b4a324f027aea19c5cbc0c3275c4656-0000.jp-tok.containers.appdomain.cloud"
+        #apps_endpoint_domain=$(oc --namespace openshift-ingress-operator get ingresscontrollers -o jsonpath='{$.items[0].status.domain}')
         universal_password=$(oc get secret universal-password -n cp4ba -o jsonpath='{.data.universalPassword}' | base64 --decode)
 
         tar xvf /ierconfig/ierconfig.tar.gz --directory /ierconfig/
@@ -195,7 +200,13 @@ function configure_ier_tm {
 
 function configure_tm { 
     echo -n "Configuring TM"
-        apps_endpoint_domain=$(oc --namespace openshift-ingress-operator get ingresscontrollers -o jsonpath='{$.items[0].status.domain}')
+
+         # REFACTOR
+        # route=$(oc get route cpd -n $CP4BA_PROJECT_NAME -o jsonpath='{.spec.host}')
+        # searchstring="cpd-$CP4BA_PROJECT_NAME."
+        # apps_endpoint_domain=${route#*$searchstring}
+        apps_endpoint_domain="itzroks-66300275ko-2u9lcj-4b4a324f027aea19c5cbc0c3275c4656-0000.jp-tok.containers.appdomain.cloud"
+        # apps_endpoint_domain=$(oc --namespace openshift-ingress-operator get ingresscontrollers -o jsonpath='{$.items[0].status.domain}')
 
         get_iam_token=$(curl -k --location --request POST 'https://cp-console.'$apps_endpoint_domain'/idprovider/v1/auth/identitytoken' \
         --header 'Content-Type: application/x-www-form-urlencoded' \
