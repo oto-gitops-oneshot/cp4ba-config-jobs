@@ -73,6 +73,8 @@ while getopts ":a:" opt; do
           oc login $oc_server --token=${oc_token} --certificate-authority=${CACERT} --kubeconfig="/tmp/config"
         #   echo "Updating secrets"
         #   update_secrets
+          # We need to wait for the restore morph job to finish, prior to seeding the databases
+          while [[ $(oc get job c-db2-restore-morph -n db2 -o 'jsonpath={..status.conditions[?(@.type=="Complete")].status}') != "True" ]]; do echo "waiting for job to complete" && sleep 10; done
           echo "Update secrets complete"
           seed_databases
           echo ""
