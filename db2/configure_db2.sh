@@ -74,9 +74,10 @@ while getopts ":a:" opt; do
         #   echo "Updating secrets"
         #   update_secrets
           # We need to wait for the restore morph job to finish, prior to seeding the databases
-          JOB_NAME=$(oc get job -n $DB2_NAMESPACE -l app=db2,formation_id=db2,job-name=c-db2-restore-morph | tail -n 1 | awk '{print $1;}')
-          while [[ $(oc get job $JOB_NAME -n $DB2_NAMESPACE -o 'jsonpath={..status.conditions[?(@.type=="Complete")].status}') != "True" ]]; do echo "waiting for job to complete" && sleep 30; done
-          echo "Update secrets complete"
+          # JOB_NAME=$(oc get job -n $DB2_NAMESPACE -l app=db2,formation_id=db2,job-name=c-db2-restore-morph | tail -n 1 | awk '{print $1;}')
+          # while [[ $(oc get job $JOB_NAME -n $DB2_NAMESPACE -o 'jsonpath={..status.conditions[?(@.type=="Complete")].status}') != "True" ]]; do echo "waiting for job to complete" && sleep 30; done
+          echo "Waiting 15 mins for DB2 to be ready"
+          sleep 900
           seed_databases
           echo ""
       else 
