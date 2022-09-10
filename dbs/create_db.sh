@@ -117,7 +117,7 @@ while getopts ":i:" opt; do
       seed_databases
 
       echo "Wait till CP4BA DB up and running.."
-      sleep 600
+      sleep 800
 
       for i in "${argv[@]}"; do
         if [[ $supported_databases =~ (^|[[:space:]])$i($|[[:space:]]) ]];  then
