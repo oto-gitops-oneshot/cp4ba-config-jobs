@@ -116,6 +116,9 @@ while getopts ":i:" opt; do
       echo $execstr;
       seed_databases
 
+      echo "Wait till CP4BA DB up and running.."
+      sleep 600
+
       for i in "${argv[@]}"; do
         if [[ $supported_databases =~ (^|[[:space:]])$i($|[[:space:]]) ]];  then
           # spit create db commands to stdout and capture them into a variable
