@@ -84,5 +84,4 @@ for item in ${POSTDEPLOY_CONFIG_LIST//,/ }
 ```
 
 # Closing statements and comments
-
-add anything extra here
+n/a
