@@ -19,7 +19,6 @@ Link to Apollo Repository: https://github.com/apollo-business-automation/ibm-cp4
 
 # Usage instructions / configurable parameters
 
-* Add the parameters that need to be passed to your script, the jobspec or the yaml job etc. i.e. 
 * *The YAML spec for this job only takes a single parameter*
     * The directory for to save a Kubeconfig file. Ultimately, this directory shouldnt need to change. 
 * This is because unlike how we need to pass services to the predeploy job as a list, once the icp4acluster object is deployed we can query the icp4acluster to get a list of services and configure based on this
