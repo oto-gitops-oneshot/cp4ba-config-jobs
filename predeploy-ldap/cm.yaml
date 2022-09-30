@@ -100,4 +100,3 @@ metadata:
   labels:
     app: openldap
   name: openldap-customldif
-  
