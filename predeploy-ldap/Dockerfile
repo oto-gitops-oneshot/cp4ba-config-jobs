@@ -3,4 +3,5 @@ WORKDIR ~
 COPY cm.yaml /tmp/cm.yaml
 COPY predeploy.sh predeploy.sh
 RUN chmod a+x predeploy.sh
+RUN chmod a+rw /tmp/cm.yaml
 CMD ["./predeploy.sh"]

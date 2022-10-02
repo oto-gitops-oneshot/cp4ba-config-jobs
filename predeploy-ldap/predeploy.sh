@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set +e
+
 function login {
   echo "Logging on..."
   TOKEN_PATH=/var/run/secrets/kubernetes.io/serviceaccount
@@ -16,6 +18,7 @@ function configmap {
   openldap_project_name="openldap"
   password=$(oc get secret universal-password -n $cp4ba_project_name -o jsonpath='{.data.universalPassword}' | base64 --decode)
   sed -i'.bak' -e "s/REPLACEME/$password/g" /tmp/cm.yaml
+  oc delete configmap openldap-customldif -n $openldap_project_name
   oc create -f /tmp/cm.yaml -n $openldap_project_name
   echo "ConfigMap created successfully"
 }
