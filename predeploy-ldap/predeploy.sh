@@ -16,6 +16,7 @@ function login {
 function configmap {
   cp4ba_project_name="cp4ba"
   openldap_project_name="openldap"
+  sleep 300
   password=$(oc get secret universal-password -n $cp4ba_project_name -o jsonpath='{.data.universalPassword}' | base64 --decode)
   # sed -i'.bak' -e "s/REPLACEME/$password/g" /tmp/cm.yaml
   sed  -e "s/REPLACEME/$password/g" /tmp/cm.yaml > /tmp/configmap.yaml
