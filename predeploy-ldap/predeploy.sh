@@ -17,9 +17,10 @@ function configmap {
   cp4ba_project_name="cp4ba"
   openldap_project_name="openldap"
   password=$(oc get secret universal-password -n $cp4ba_project_name -o jsonpath='{.data.universalPassword}' | base64 --decode)
-  sed -i'.bak' -e "s/REPLACEME/$password/g" /tmp/cm.yaml
+  # sed -i'.bak' -e "s/REPLACEME/$password/g" /tmp/cm.yaml
+  sed  -e "s/REPLACEME/$password/g" /tmp/cm.yaml > /tmp/configmap.yaml
   oc delete configmap openldap-customldif -n $openldap_project_name
-  oc create -f /tmp/cm.yaml -n $openldap_project_name
+  oc create -f /tmp/configmap.yaml -n $openldap_project_name
   echo "ConfigMap created successfully"
 }
 
